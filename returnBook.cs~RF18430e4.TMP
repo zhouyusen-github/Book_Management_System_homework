@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+using System.Data.OleDb;
+
+namespace WindowsFormsApp1
+{
+    public partial class returnBook : Form
+    {
+        public returnBook()
+        {
+            InitializeComponent();
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            string bookName = textBox1.Text;
+            
+            
+            string Con = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\10153\Desktop\C#\01大作业\大作业文件\Database1.accdb";//第二个参数为文件的路径，记得在字符串前加@
+         
+            OleDbConnection dbconn = new OleDbConnection(Con);
+            dbconn.Open();//建立连接
+            //查询是否存在该书
+            string Select2 = "SELECT *FROM bookData WHERE bookName = '" + bookName + "'";
+            OleDbCommand inst2 = new OleDbCommand(Select2, dbconn);
+            OleDbDataReader reder2 = inst2.ExecuteReader();
+            if (!reder2.Read())//不存在该书
+            {
+                borrowBookNameFail b2 = new borrowBookNameFail();
+                textBox1.Text = "";
+                b2.Show();
+            } else {
+                //查询该书是否被借出
+                string Select3 = "SELECT *FROM bookData WHERE bookName = '" + bookName + "' AND isBorrow='Yes'";
+                //SELECT * FROM Persons WHERE FirstName='Thomas' AND LastName='Carter'
+                OleDbCommand inst3 = new OleDbCommand(Select3, dbconn);
+                OleDbDataReader reder3 = inst3.ExecuteReader();
+                if (!reder3.Read())//未被借出
+                {
+                    notBorrow b3 = new notBorrow();
+                    b3.Show();
+                }
+
+            }
+
+            
+
+
+
+            //INSERT INTO Persons (LastName, Address) VALUES ('Wilson', 'Champs-Elysees')
+
+            //若书已被借出，则修改bookData，及删除borrowData数据
+            string sql = "DELETE FROM borrowData WHERE bookName = '"+ bookName + "'";
+
+
+
+            OleDbCommand oleDbCommand = new OleDbCommand(sql, dbconn);
+            oleDbCommand.ExecuteNonQuery();//加了这句才能生效
+            dbconn.Close();//关闭连接
+
+        }
+    }
+}

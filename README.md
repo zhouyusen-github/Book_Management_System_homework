@@ -1,1 +1,3 @@
 # Book_Management_System_homework
+
+数据库文件在/bin/Debug下，是一个accdb文件，当然其实也可以换成别的数据库的
